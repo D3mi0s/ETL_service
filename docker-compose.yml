@@ -1,0 +1,35 @@
+version: '3.8'  #версия синтаксиса языка yaml
+
+services:
+    postgres:
+        image: postgres:14           #образ с Docker Hub
+        environment:                 #настройка окружения
+            POSTGRES_USER: admin     #наименование поля должно быть именно таким, сам логин - любым
+            POSTGRES_PASSWORD: admin #аналогично логину
+        volumes:    #настройка пути, связывает папку на ПК с папкой в контейнере
+            - postgres_data:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+    
+    rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+            - "5672:5672"   #порт ПК:Контейнер 
+            - "15672:15672" #порт ПК:Контейнер для веб интерфейса
+    
+    minio:
+        image: minio/minio
+        command: server /data --console-address ":9001"  #запустит minio в режиме сервера
+        environment:
+            MINIO_ROOT_USER: minioadmin
+            MINIO_ROOT_PASSWORD: minioadmin
+        volumes:
+            - minio_data:/data
+        ports:
+            - "9000:9000" #порт ПК:Контейнер
+            - "9001:9001" #порт ПК:Контейнер для веб интерфейса
+
+
+volumes:
+    postgres_data:
+    minio_data:
