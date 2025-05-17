@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
@@ -36,8 +37,22 @@ func initMinIO() *minio.Client {
 	}
 
 	if !exist {
-
+		err := client.MakeBucket(ctx, MinioBucket, minio.MakeBucketOptions{})
+		if err != nil {
+			log.Fatalf("Ошибка создания бакета: %v", err)
+		}
+		log.Printf("Бакет %s успешно создан", MinioBucket)
 	}
 
 	return client
+}
+
+func setupRouter(minioClient *minio.Client) *gin.Engine {
+	router := gin.Default()
+
+	router.POST("/upload", func(c *gin.Context) {
+		//file, header, err := c.Request.FormFile("file")
+	})
+
+	return router
 }
