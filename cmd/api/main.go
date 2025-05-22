@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
@@ -51,8 +52,19 @@ func setupRouter(minioClient *minio.Client) *gin.Engine {
 	router := gin.Default()
 
 	router.POST("/upload", func(c *gin.Context) {
-		//file, header, err := c.Request.FormFile("file")
+		file, header, err := c.Request.FormFile("file")
+		if err != nil {
+			sendError(c, http.StatusBadRequest, "file is not found in order")
+		}
+		defer file.Close()
 	})
 
 	return router
+}
+
+func sendError(c *gin.Context, code int, message string) {
+	c.AbortWithStatusJSON(code, gin.H{
+		"error":   true,
+		"message": message,
+	})
 }
