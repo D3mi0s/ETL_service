@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
@@ -17,6 +18,18 @@ const (
 )
 
 func main() {
+
+	r := gin.Default()
+
+	r.POST("/upload", func(c *gin.Context) {
+		file, err := c.FormFile("file")
+		if err != nil {
+			c.AbortWithStatusJSON(400, gin.H{
+				"error": "Файл не найдн",
+			})
+		}
+	})
+
 	client, err := minio.New(Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(AccessKeyId, SecretAccessKey, ""),
 		Secure: UseSSL,
