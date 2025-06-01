@@ -25,9 +25,18 @@ func main() {
 		file, err := c.FormFile("file")
 		if err != nil {
 			c.AbortWithStatusJSON(400, gin.H{
-				"error": "Файл не найдн",
+				"error": "Файл не найден",
 			})
 		}
+
+		src, err := file.Open()
+		if err != nil {
+			c.AbortWithStatusJSON(500, gin.H{
+				"error": "Не удалось открыть файл",
+			})
+			return
+		}
+		defer src.Close()
 	})
 
 	client, err := minio.New(Endpoint, &minio.Options{
@@ -49,4 +58,6 @@ func main() {
 			fmt.Println("Ошибка создания бакета:", err)
 		}
 	}
+
+	r.Run(":8080")
 }
